@@ -11,16 +11,18 @@ type Server struct{ db Datastore }
 type SimpleDB struct{}
 
 func (db *SimpleDB) Save(data string) error {
-	log.Printf("REAL_DB: Saving data: %s", data)
-
+	log.Print("saving")
 	return nil
 }
-func main() {
-	realDB := &SimpleDB{}
 
-	server := &Server{db: realDB}
+func main() {
+	theDb := &SimpleDB{}
+	server := &Server{db: theDb}
 
 	http.HandleFunc("/hello", server.HelloHandler)
+
+	log.Println("Starting server on :8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func (s *Server) HelloHandler(w http.ResponseWriter, r *http.Request) {
