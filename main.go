@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -20,5 +19,6 @@ func GetCommentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
-	fmt.Fprintf(w, "Fetching video with id: %v", videoId)
+	w.Write([]byte("Fetching comments for video " + videoId))
+
 }
