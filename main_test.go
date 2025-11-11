@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func TestGetCommentHandler(t *testing.T) {
@@ -27,15 +29,23 @@ func TestGetCommentHandler(t *testing.T) {
 }
 
 func TestPostCommentHandler(t *testing.T) {
+
+	mux := chi.NewRouter()
+	mux.Post("/video/{videoID}/comment", PostCommentHandler)
 	payload := `{"user_id": "u352", "text": "this is such a comment"}`
 
-	req := httptest.NewRequest("POST", "/comments", strings.NewReader(payload))
+	req := httptest.NewRequest("POST", "/video/v789/comment", strings.NewReader(payload))
 
 	req.Header.Set("Content-Type", "application/json")
-	rr := httptest.NewRecorder()
-	PostCommentHandler(rr, req)
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("wrong status code")
+	rr := httptest.NewRecorder()
+
+	mux.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v", rr.Code, http.StatusCreated)
+	}
+	if !strings.Contains(rr.Body.String(), "v789") {
+		t.Errorf("handler body did not include videoID: got %v", rr.Body.String())
 	}
 }
